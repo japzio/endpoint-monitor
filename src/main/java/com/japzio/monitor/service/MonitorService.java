@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface MonitorService {
-    void saveResults(List<EndpointStatus> endpointStatusList);
+    void saveResults(Map<String, EndpointStatus> endpointStatus);
     Map<String, EndpointStatus> getResults();
 }

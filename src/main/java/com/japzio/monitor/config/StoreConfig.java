@@ -9,8 +9,10 @@ import java.util.Map;
 
 @Configuration
 public class StoreConfig {
+
     @Bean
     public Map<String, EndpointStatus> endpointStatusStore(){
         return new HashMap<>();
     }
+
 }

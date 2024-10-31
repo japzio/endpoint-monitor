@@ -2,6 +2,7 @@ package com.japzio.monitor.runner;
 
 import com.japzio.monitor.config.MonitorConfig;
 import com.japzio.monitor.model.EndpointStatus;
+import com.japzio.monitor.service.MonitorService;
 import com.japzio.monitor.task.CurlTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,12 @@ public class TaskRunner {
     private static final Logger log = LoggerFactory.getLogger(TaskRunner.class);
 
     public MonitorConfig monitorConfig;
-    public Map<String, EndpointStatus> endpointStatusStore;
+    public MonitorService monitorService;
 
     TaskRunner(@Autowired MonitorConfig monitorConfig,
-               @Autowired Map<String, EndpointStatus> endpointStatusStore) {
+               @Autowired MonitorService monitorService) {
         this.monitorConfig = monitorConfig;
-        this.endpointStatusStore = endpointStatusStore;
+        this.monitorService = monitorService;
     }
 
     @Scheduled(fixedRate = 5000)
@@ -37,7 +38,7 @@ public class TaskRunner {
 
         for (URL targetEndpoint : monitorConfig.getTargetEndpoints()) {
             log.info("submit CurlTask({})", targetEndpoint.toString());
-            executorService.submit(new CurlTask(targetEndpoint.toString(), endpointStatusStore));
+            executorService.submit(new CurlTask(targetEndpoint.toString(), monitorService));
         }
 
         try {
