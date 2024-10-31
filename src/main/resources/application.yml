@@ -2,7 +2,8 @@ spring:
   application:
     name: curl-executor
 
-executor:
+monitor:
+  cron-expression: "0 * * * * *"
   target-endpoints:
     - http://localhost:7000/actuator/info
     - https://github.com

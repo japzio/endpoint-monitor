@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "executor")
+@ConfigurationProperties(prefix = "monitor")
 public class MonitorConfig {
 
     private List<URL> targetEndpoints;

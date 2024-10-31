@@ -7,6 +7,7 @@ import com.japzio.monitor.task.CurlTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +22,8 @@ public class TaskRunner {
 
     private static final Logger log = LoggerFactory.getLogger(TaskRunner.class);
 
-    public MonitorConfig monitorConfig;
-    public MonitorService monitorService;
+    private final MonitorConfig monitorConfig;
+    private final MonitorService monitorService;
 
     TaskRunner(@Autowired MonitorConfig monitorConfig,
                @Autowired MonitorService monitorService) {
@@ -30,7 +31,7 @@ public class TaskRunner {
         this.monitorService = monitorService;
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "${monitor.cron-expression}")
     public void runCurl() {
 
         log.info("run curl - start");
