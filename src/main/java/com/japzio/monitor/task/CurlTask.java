@@ -29,7 +29,7 @@ public class CurlTask implements Runnable {
         log.info("runnable task - curl - start");
         CUrl curlRequest = new CUrl(targetEndpoint);
         curlRequest.exec();
-
+        log.info("curl exec - {}", targetEndpoint);
         log.info("curl result - {}", curlRequest.getHttpCode());
         monitorService.saveResults(
                 Map.of(

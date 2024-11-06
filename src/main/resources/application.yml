@@ -1,6 +1,17 @@
 spring:
+  resources:
+    static-locations: "classpath:/ui/"
   application:
     name: curl-executor
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - info
+          - env
+          - health
 
 monitor:
   cron-expression: "0 * * * * *"
@@ -8,3 +19,4 @@ monitor:
     - http://localhost:7000/actuator/info
     - https://github.com
     - https://www.google.com
+

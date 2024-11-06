@@ -1,18 +1,15 @@
 package com.japzio.monitor.runner;
 
 import com.japzio.monitor.config.MonitorConfig;
-import com.japzio.monitor.model.EndpointStatus;
 import com.japzio.monitor.service.MonitorService;
 import com.japzio.monitor.task.CurlTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
