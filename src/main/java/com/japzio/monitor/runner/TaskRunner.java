@@ -1,19 +1,16 @@
 package com.japzio.monitor.runner;
 
-import com.japzio.monitor.model.MonitorJob;
-import com.japzio.monitor.model.SupportedMethods;
-import com.japzio.monitor.service.MonitorService;
+import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.repository.CheckResultRepository;
+import com.japzio.monitor.repository.TargetRepository;
 import com.japzio.monitor.task.CurlTask;
 import com.japzio.monitor.task.PingTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -23,36 +20,40 @@ public class TaskRunner {
 
     private static final Logger log = LoggerFactory.getLogger(TaskRunner.class);
 
-    private final MonitorService monitorService;
-    private final Set<MonitorJob> targetsStorage;
+    private final TargetRepository targetRepository;
+    private final CheckResultRepository checkResultRepository;
 
-    TaskRunner(@Autowired MonitorService monitorService,
-               @Autowired @Qualifier("targetsStorage") Set<MonitorJob> targetsStorage) {
-        this.monitorService = monitorService;
-        this.targetsStorage = targetsStorage;
+    TaskRunner(
+            @Autowired TargetRepository targetRepository,
+            @Autowired CheckResultRepository checkResultRepository
+    ) {
+        this.targetRepository = targetRepository;
+        this.checkResultRepository = checkResultRepository;
     }
 
     @Scheduled(cron = "${monitor.cron-expression}")
     public void runJob() {
 
-        if(targetsStorage.isEmpty()) {
+        var enabledTargets = targetRepository.findAllByEnabledTrue();
+
+        if(enabledTargets.isEmpty()) {
             log.warn("exiting... no targets found");
             return;
         }
 
         log.info("run job - start");
-        ExecutorService executorService = Executors.newFixedThreadPool(targetsStorage.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(enabledTargets.size());
 
-        for (MonitorJob monitorJob: targetsStorage) {
-            log.info("submit Task({})", monitorJob.getEndpoint());
-            switch(monitorJob.getMethod()) {
+        for (Target target: enabledTargets) {
+            log.info("submit Task({})", target.getEndpoint());
+            switch(target.getMethod()) {
                 case CURL:
                     log.info("action=submitTask, info=CurlTask");
-                    executorService.submit(new CurlTask(monitorJob, monitorService));
+                    executorService.submit(new CurlTask(target, checkResultRepository));
                     break;
                 case PING:
                     log.info("action=submitTask, info=PingTask");
-                    executorService.submit(new PingTask(monitorJob, monitorService));
+                    executorService.submit(new PingTask(target, checkResultRepository));
                     break;
                 default:
                     log.warn("unsupported method");

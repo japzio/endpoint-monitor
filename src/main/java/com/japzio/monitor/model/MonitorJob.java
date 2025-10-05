@@ -1,13 +1,12 @@
 package com.japzio.monitor.model;
 
+import com.japzio.monitor.entity.CheckResult;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 
-import java.net.URL;
 import java.time.Instant;
 
 @Builder
@@ -22,7 +21,8 @@ public class MonitorJob {
     @NotNull
     private SupportedMethods method;
 
-    private final Instant dateAdded = Instant.now();
+    private CheckResult checkResult;
 
+    private Instant dateAdded = Instant.now();
 
 }

@@ -1,16 +1,13 @@
 package com.japzio.monitor.service;
 
-import com.japzio.monitor.model.EndpointStatus;
-import com.japzio.monitor.model.MonitorJob;
 import com.japzio.monitor.model.command.AddTargetCommand;
-
-import java.util.Map;
-import java.util.Set;
+import com.japzio.monitor.model.dto.AddTargetResponse;
+import com.japzio.monitor.model.dto.GetAllTargetsCommand;
+import com.japzio.monitor.model.dto.GetAllTargetsResponse;
 
 public interface MonitorService {
 
-    Set<MonitorJob> getTargets();
-    void saveResults(Map<String, EndpointStatus> endpointStatus);
-    Map<String, EndpointStatus> getResults();
-    void saveNewTarget(AddTargetCommand command);
+    GetAllTargetsResponse getAllTargets(GetAllTargetsCommand command);
+    AddTargetResponse addNewTarget(AddTargetCommand command);
+
 }

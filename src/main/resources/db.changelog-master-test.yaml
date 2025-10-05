@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changelog-000-bootstrap.sql
+  - include:
+      file: db/changelog/changelog-001-add-column-on-target.yaml

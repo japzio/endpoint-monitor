@@ -1,19 +1,14 @@
 package com.japzio.monitor.controller;
 
-import com.japzio.monitor.model.EndpointStatus;
-import com.japzio.monitor.model.MonitorJob;
 import com.japzio.monitor.model.command.AddTargetCommand;
 import com.japzio.monitor.model.dto.AddTargetRequest;
 import com.japzio.monitor.model.dto.AddTargetResponse;
+import com.japzio.monitor.model.dto.GetAllTargetsCommand;
+import com.japzio.monitor.model.dto.GetAllTargetsResponse;
 import com.japzio.monitor.service.MonitorService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 @RestController
 @Validated
@@ -27,26 +22,26 @@ public class MonitorController {
         this.monitorService = monitorService;
     }
 
-    @PostMapping("/targets")
-    public AddTargetResponse addTarget(
-            @RequestBody @Valid AddTargetRequest request
+    @GetMapping("/targets")
+    public GetAllTargetsResponse getTargets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ) {
-        monitorService.saveNewTarget(AddTargetCommand.builder()
+        return monitorService.getAllTargets(
+                GetAllTargetsCommand.builder()
+                        .page(page)
+                        .size(size)
+                        .build()
+        );
+    }
+
+    @PostMapping("/targets")
+    public AddTargetResponse addNewTarget(
+            @RequestBody AddTargetRequest request
+            ) {
+        return monitorService.addNewTarget(AddTargetCommand.builder()
                         .request(request)
                 .build());
-        return AddTargetResponse.builder()
-                .status("Ok")
-                .build();
-    }
-
-    @GetMapping("/targets")
-    public Set<MonitorJob> getTargets() {
-        return monitorService.getTargets();
-    }
-
-    @GetMapping("/statuses")
-    public Map<String, EndpointStatus> getEndpointStatuses() {
-        return monitorService.getResults();
     }
 
 }
