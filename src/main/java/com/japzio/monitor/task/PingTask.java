@@ -1,34 +1,34 @@
 package com.japzio.monitor.task;
 
-import com.japzio.monitor.model.EndpointStatus;
-import com.japzio.monitor.model.MonitorJob;
-import com.japzio.monitor.service.MonitorService;
+import com.japzio.monitor.entity.CheckResult;
+import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.repository.CheckResultRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Map;
 
 public class PingTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PingTask.class);
 
-    private final MonitorJob monitorJob;
-    private final MonitorService monitorService;
+    private final Target target;
+    private final CheckResultRepository checkResultRepository;
 
     public PingTask(
-            MonitorJob monitorJob,
-            MonitorService monitorService
+            Target target,
+            CheckResultRepository checkResultRepository
     ) {
-        this.monitorJob = monitorJob;
-        this.monitorService = monitorService;
+        this.target = target;
+        this.checkResultRepository = checkResultRepository;
     }
 
     @Override
     public void run() {
-        String targetEndpoint = monitorJob.getEndpoint();
-        log.info("runnable task - ping - start");
+        String targetEndpoint = target.getEndpoint();
+        log.info("runnable task - ping - start targetId={}", target.getId());
         try {
             var status = "unset";
             String host = "google.com";
@@ -48,17 +48,13 @@ public class PingTask implements Runnable {
             log.info("ping exec - {}", targetEndpoint);
             log.info("ping result - {}", status);
 
-            monitorService.saveResults(
-                    Map.of(
-                            targetEndpoint,
-                            new EndpointStatus(
-                                    monitorJob,
-                                    status,
-                                    Instant.now().toString()
-                            )
-                    )
+            checkResultRepository.save(
+                    CheckResult.builder()
+                            .status(status)
+                            .targetId(target.getId())
+                            .createdAt(Timestamp.from(Instant.now()))
+                            .build()
             );
-
         } catch (Exception e) {
             e.printStackTrace();
         }

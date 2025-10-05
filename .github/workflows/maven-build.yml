@@ -1,0 +1,36 @@
+# This workflow builds a Java project with Maven on PRs and post-merge to develop/master
+# Tests use Testcontainers for PostgreSQL, no manual Docker setup needed
+# For more information: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+name: Maven Build on PR and Post-Merge
+
+on:
+  pull_request:
+    branches: [develop, master]
+  push:
+    branches: [develop, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17  # Adjust to your JDK version (Spring Boot 3.5.6 supports 17+)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven  # Caches Maven dependencies to speed up builds
+
+      - name: Build with Maven
+        run: mvn -B clean install --file pom.xml
+
+      - name: Upload test results
+        if: always()  # Runs even if build fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-test-results
+          path: target/surefire-reports/

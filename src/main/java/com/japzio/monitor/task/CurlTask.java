@@ -1,47 +1,44 @@
 package com.japzio.monitor.task;
 
-import com.japzio.monitor.model.EndpointStatus;
-import com.japzio.monitor.model.MonitorJob;
-import com.japzio.monitor.service.MonitorService;
+import com.japzio.monitor.entity.CheckResult;
+import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.repository.CheckResultRepository;
 import com.roxstudio.utils.CUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Map;
 
 public class CurlTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PingTask.class);
 
-    private final MonitorJob monitorJob;
-    private final MonitorService monitorService;
+    private final Target target;
+    private final CheckResultRepository checkResultRepository;
 
     public CurlTask(
-            MonitorJob monitorJob,
-            MonitorService monitorService
+           Target target,
+           CheckResultRepository checkResultRepository
     ) {
-        this.monitorJob = monitorJob;
-        this.monitorService = monitorService;
+        this.target = target;
+        this.checkResultRepository = checkResultRepository;
     }
 
     @Override
     public void run() {
-        String targetEndpoint = monitorJob.getEndpoint();
-        log.info("runnable task - curl - start");
+        String targetEndpoint = target.getEndpoint();
+        log.info("runnable task - curl - start targetId={}", target.getId());
         CUrl curlRequest = new CUrl(targetEndpoint);
         curlRequest.exec();
         log.info("curl exec - {}", targetEndpoint);
         log.info("curl result - {}", curlRequest.getHttpCode());
-        monitorService.saveResults(
-                Map.of(
-                        targetEndpoint,
-                        new EndpointStatus(
-                                monitorJob,
-                                String.valueOf(curlRequest.getHttpCode()),
-                                Instant.now().toString()
-                        )
-                )
+        checkResultRepository.save(
+                CheckResult.builder()
+                        .status(String.valueOf(curlRequest.getHttpCode()))
+                        .targetId(target.getId())
+                        .createdAt(Timestamp.from(Instant.now()))
+                        .build()
         );
         log.info("runnable task - curl - done");
     }

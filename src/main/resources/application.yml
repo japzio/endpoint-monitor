@@ -1,8 +1,6 @@
 spring:
-  resources:
-    static-locations: "classpath:/ui/"
   application:
-    name: curl-executor
+    name: endpoint-monitor
 
 management:
   endpoints:
@@ -15,4 +13,3 @@ management:
 
 monitor:
   cron-expression: "0 * * * * *"
-
