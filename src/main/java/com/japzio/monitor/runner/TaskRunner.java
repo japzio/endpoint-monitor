@@ -5,6 +5,7 @@ import com.japzio.monitor.repository.CheckResultRepository;
 import com.japzio.monitor.repository.TargetRepository;
 import com.japzio.monitor.task.CurlTask;
 import com.japzio.monitor.task.PingTask;
+import com.japzio.monitor.task.TelnetTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -37,12 +39,17 @@ public class TaskRunner {
         var enabledTargets = targetRepository.findAllByEnabledTrue();
 
         if(enabledTargets.isEmpty()) {
-            log.warn("exiting... no targets found");
+            log.warn("exiting... no \"enabled\" targets found");
             return;
         }
 
         log.info("run job - start");
         ExecutorService executorService = Executors.newFixedThreadPool(enabledTargets.size());
+
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executorService;
+
+        log.info("executorService started. coreSize={}, active={}, completedTask={}",
+                threadPoolExecutor.getCorePoolSize(), threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
 
         for (Target target: enabledTargets) {
             log.info("submit Task({})", target.getEndpoint());
@@ -54,6 +61,10 @@ public class TaskRunner {
                 case PING:
                     log.info("action=submitTask, info=PingTask");
                     executorService.submit(new PingTask(target, checkResultRepository));
+                    break;
+                case TELNET:
+                    log.info("action=submitTask, info=TelnetTask");
+                    executorService.submit(new TelnetTask(target, checkResultRepository));
                     break;
                 default:
                     log.warn("unsupported method");

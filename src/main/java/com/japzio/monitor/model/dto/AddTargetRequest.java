@@ -19,4 +19,6 @@ public class AddTargetRequest {
     @NotNull
     private SupportedMethods method;
 
+    private Boolean enabled;
+
 }

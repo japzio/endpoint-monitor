@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20251005-update-method-check-constraint-to-ping-curl-telnet
+      author: grok
+      preConditions:
+        - onFail: MARK_RAN
+          sqlCheck:
+            expectedResult: 1
+            sql: |
+              SELECT COUNT(*)
+              FROM information_schema.table_constraints
+              WHERE table_schema = 'public'
+              AND table_name = 'targets'
+              AND constraint_name = 'method_check';
+      comment: Update method_check constraint to allow only PING, CURL, and TELNET
+      changes:
+        - sql:
+            sql: |
+              ALTER TABLE public.targets
+              DROP CONSTRAINT method_check;
+        - sql:
+            sql: |
+              UPDATE public.targets
+              SET method = 'PING'
+              WHERE method NOT IN ('PING', 'CURL', 'TELNET');
+        - sql:
+            sql: |
+              ALTER TABLE public.targets
+              ADD CONSTRAINT method_check
+              CHECK (method IN ('PING', 'CURL', 'TELNET'));
+      rollback:
+        - sql:
+            sql: |
+              ALTER TABLE public.targets
+              DROP CONSTRAINT method_check;
+        - sql:
+            sql: |
+              ALTER TABLE public.targets
+              ADD CONSTRAINT method_check
+              CHECK (method IN ('PING', 'CURL'));

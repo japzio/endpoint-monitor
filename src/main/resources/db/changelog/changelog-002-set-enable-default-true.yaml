@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: remove-not-null-enabled
+      author: your-name
+      changes:
+        - sql:
+            sql: |
+              ALTER TABLE targets ALTER COLUMN enabled DROP NOT NULL;
+              ALTER TABLE targets ALTER COLUMN enabled SET DEFAULT true;
