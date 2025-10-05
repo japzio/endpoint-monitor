@@ -13,14 +13,14 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CheckStatusResponse {
+public class CheckResultResponse {
     private UUID id;
     private UUID targetId;
     private String status;
     private Instant createAt;
 
-    public static CheckStatusResponse fromEntity(CheckResult checkResult) {
-        return CheckStatusResponse.builder()
+    public static CheckResultResponse fromEntity(CheckResult checkResult) {
+        return CheckResultResponse.builder()
                 .id(checkResult.getId())
                 .status(checkResult.getStatus())
                 .createAt(checkResult.getCreatedAt().toInstant())
