@@ -31,10 +31,10 @@ public class PingTask implements Runnable {
         log.info("runnable task - ping - start targetId={}", target.getId());
         try {
             var status = "unset";
-            String host = "google.com";
+
             InetAddress inet = InetAddress.getByName(targetEndpoint);
 
-            System.out.println("Pinging " + host + "...");
+            System.out.println("Pinging " + targetEndpoint + "...");
             boolean reachable = inet.isReachable(5000); // timeout in ms
 
             if (reachable) {

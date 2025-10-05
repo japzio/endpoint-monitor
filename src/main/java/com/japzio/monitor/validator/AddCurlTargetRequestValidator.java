@@ -10,7 +10,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 @Slf4j
-public class AddNewTargetRequestValidator implements Validator<AddTargetRequest> {
+public class AddCurlTargetRequestValidator implements Validator<AddTargetRequest> {
 
     @Override
     public void validate(AddTargetRequest addTargetRequest, List<String> errors) {

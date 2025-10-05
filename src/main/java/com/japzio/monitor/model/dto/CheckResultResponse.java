@@ -22,6 +22,7 @@ public class CheckResultResponse {
     public static CheckResultResponse fromEntity(CheckResult checkResult) {
         return CheckResultResponse.builder()
                 .id(checkResult.getId())
+                .targetId(checkResult.getTargetId())
                 .status(checkResult.getStatus())
                 .createAt(checkResult.getCreatedAt().toInstant())
                 .build();

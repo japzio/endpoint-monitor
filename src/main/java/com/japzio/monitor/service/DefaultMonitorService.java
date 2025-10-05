@@ -80,16 +80,19 @@ public class DefaultMonitorService implements MonitorService {
         }
         log.info("action=saveNewTarget");
         AddTargetRequest request = command.getRequest();
-        targetRepository.save(Target.builder()
+
+        var target = Target.builder()
                 .endpoint(request.getEndpoint())
+                .enabled(request.getEnabled())
                 .method(request.getMethod())
                 .createdAt(Timestamp.from(Instant.now()))
-                .build());
+                .build();
+
+        targetRepository.save(target);
 
         return AddTargetResponse.builder()
                 .status("OK")
                 .build();
-
     }
 
     @Override

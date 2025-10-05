@@ -27,10 +27,16 @@ public class Target {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
+
     private String endpoint;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
     private SupportedMethods method;
+
+    @Column(insertable = false)
     private Boolean enabled;
+
+    @Column(insertable = false)
     private Timestamp createdAt;
 }
