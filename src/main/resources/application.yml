@@ -15,8 +15,4 @@ management:
 
 monitor:
   cron-expression: "0 * * * * *"
-  target-endpoints:
-    - http://localhost:7000/actuator/info
-    - https://github.com
-    - https://www.google.com
 

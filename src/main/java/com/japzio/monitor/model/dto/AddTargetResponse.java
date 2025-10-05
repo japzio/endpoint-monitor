@@ -1,18 +1,19 @@
-package com.japzio.monitor.model;
+package com.japzio.monitor.model.dto;
 
+import com.japzio.monitor.model.SupportedMethods;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.management.monitor.Monitor;
+import java.net.URL;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EndpointStatus {
-    private MonitorJob monitorJob;
+public class AddTargetResponse {
+
     private String status;
-    private String timestamp;
+
 }
