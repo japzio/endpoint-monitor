@@ -2,7 +2,6 @@ package com.japzio.monitor.model.dto;
 
 import com.japzio.monitor.entity.Target;
 import com.japzio.monitor.model.SupportedMethods;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

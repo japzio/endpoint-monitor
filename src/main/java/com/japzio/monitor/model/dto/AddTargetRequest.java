@@ -2,9 +2,10 @@ package com.japzio.monitor.model.dto;
 
 import com.japzio.monitor.model.SupportedMethods;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
-import java.net.URL;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data

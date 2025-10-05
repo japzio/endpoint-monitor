@@ -1,9 +1,18 @@
 package com.japzio.monitor.service;
 
+import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
 import com.japzio.monitor.exception.AddNewTargetException;
 import com.japzio.monitor.model.command.AddTargetCommand;
-import com.japzio.monitor.model.dto.*;
+import com.japzio.monitor.model.dto.AddTargetRequest;
+import com.japzio.monitor.model.dto.AddTargetResponse;
+import com.japzio.monitor.model.dto.CheckResultResponse;
+import com.japzio.monitor.model.dto.GetAllCheckResultsCommand;
+import com.japzio.monitor.model.dto.GetAllCheckResultsResponse;
+import com.japzio.monitor.model.dto.GetAllTargetsCommand;
+import com.japzio.monitor.model.dto.GetAllTargetsResponse;
+import com.japzio.monitor.model.dto.TargetResponse;
+import com.japzio.monitor.repository.CheckResultRepository;
 import com.japzio.monitor.repository.TargetRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +29,23 @@ import java.util.Map;
 @Slf4j
 public class DefaultMonitorService implements MonitorService {
 
+    private static final String CURRENT_PAGE = "currentPage";
+    private static final String CURRENT_PAGE_ITEMS = "currentPageItems";
+    private static final String TOTAL_PAGES = "totalPages";
+    private static final String TOTAL_ELEMENTS = "totalElements";
+
     private final MonitorValidatorService monitorValidatorService;
     private final TargetRepository targetRepository;
+    private final CheckResultRepository checkResultRepository;
 
     public DefaultMonitorService(
             @Autowired MonitorValidatorService monitorValidatorService,
-            @Autowired TargetRepository targetRepository
+            @Autowired TargetRepository targetRepository,
+            @Autowired CheckResultRepository checkResultRepository
     ) {
         this.monitorValidatorService = monitorValidatorService;
         this.targetRepository = targetRepository;
+        this.checkResultRepository = checkResultRepository;
     }
 
     public GetAllTargetsResponse getAllTargets(GetAllTargetsCommand command) {
@@ -45,9 +62,10 @@ public class DefaultMonitorService implements MonitorService {
                 )
                 .metadata(
                         Map.of(
-                                "currentPage", result.getNumber(),
-                                "totalPages", result.getTotalPages(),
-                                "totalElements", result.getTotalElements()
+                                CURRENT_PAGE, result.getNumber(),
+                                CURRENT_PAGE_ITEMS, result.getContent().size(),
+                                TOTAL_PAGES, result.getTotalPages(),
+                                TOTAL_ELEMENTS, result.getTotalElements()
                         )
                 )
                 .build();
@@ -70,6 +88,31 @@ public class DefaultMonitorService implements MonitorService {
 
         return AddTargetResponse.builder()
                 .status("OK")
+                .build();
+
+    }
+
+    @Override
+    public GetAllCheckResultsResponse getAllTargetCheckResults(GetAllCheckResultsCommand command) {
+
+        var pageRequest = PageRequest.of(command.getPage(), command.getSize());
+
+        Page<CheckResult> result = checkResultRepository.findAllByTargetId(command.getTargetId(), pageRequest);
+
+        return GetAllCheckResultsResponse.builder()
+                .checkResults(
+                        result.getContent().stream()
+                                .map(CheckResultResponse::fromEntity)
+                                .toList()
+                )
+                .metadata(
+                        Map.of(
+                                CURRENT_PAGE, result.getNumber(),
+                                CURRENT_PAGE_ITEMS, result.getContent().size(),
+                                TOTAL_PAGES, result.getTotalPages(),
+                                TOTAL_ELEMENTS, result.getTotalElements()
+                        )
+                )
                 .build();
 
     }
