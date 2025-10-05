@@ -13,15 +13,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17  # Adjust to your JDK version (Spring Boot 3.5.6 supports 17+)
+      - name: Set up JDK 21  # Adjust to your JDK version (Spring Boot 3.5.6 supports 17+)
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven  # Caches Maven dependencies to speed up builds
 
