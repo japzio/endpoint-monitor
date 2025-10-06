@@ -17,5 +17,6 @@ Note: This is purely rest api interaction. WebUI is still to follow :-D
 - Setup Docker
 - PostgreSQL local or can be docker
 - Import [changelog-000-bootstrap.sql](src/main/resources/db/changelog/changelog-000-bootstrap.sql)
+- - Succeeding database changes are here [classpath:db/changelog/](src/main/resources/db/changelog)
 - Update [application-local.yml](src/main/resources/application-local.yml) especially for datasource and liquibase related configs
 - Try to run the application, liquibase should be enabled -local.yml
