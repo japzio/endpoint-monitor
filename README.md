@@ -2,8 +2,9 @@
 
 A self-hosted endpoint monitoring tool built with Spring Boot 3.5.x and Java 21, supporting curl (java-curl), ping (InetAddress.isReachable), and telnet (commons-net TelnetClient). Targets are stored in PostgreSQL 18, with checks run via Spring Scheduler and results saved in a `check_results` table. Liquibase manages schema migrations, and tests use TestRestTemplate and TestContainers.
 
-[![Build Status](https://github.com/japzio/endpoint-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/japzio/endpoint-monitor)
-[![Coverage](https://img.shields.io/badge/coverage-80%25-green)](https://github.com/japzio/endpoint-monitor)
+## Badges
+
+[TODO]
 
 ## Database Setup
 
