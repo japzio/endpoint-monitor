@@ -12,8 +12,8 @@ Note: This is purely rest api interaction. WebUI is still to follow :-D
 - Liquibase
 - TestContainers(requires Docker)
 - Task dependencies 
-    - [java-curl](https://github.com/rockswang/java-curl)
-    - [apache commons-net](https://commons.apache.org/proper/commons-net/index.html)
+    - [rockswang/java-curl](https://github.com/rockswang/java-curl)
+    - Apache Commons-Net [TelnetClient](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/telnet/package-summary.html)
     - [InetAddress](https://docs.oracle.com/en/java/javase/21/docs/api//java.base/java/net/class-use/InetAddress.html)
 
 # Local Dev Environment
