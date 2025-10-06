@@ -11,6 +11,7 @@ import com.japzio.monitor.model.dto.GetAllCheckResultsCommand;
 import com.japzio.monitor.model.dto.GetAllCheckResultsResponse;
 import com.japzio.monitor.model.dto.GetAllTargetsCommand;
 import com.japzio.monitor.model.dto.GetAllTargetsResponse;
+import com.japzio.monitor.model.dto.Metadata;
 import com.japzio.monitor.model.dto.TargetResponse;
 import com.japzio.monitor.repository.CheckResultRepository;
 import com.japzio.monitor.repository.TargetRepository;
@@ -29,11 +30,6 @@ import java.util.Map;
 @Service
 @Slf4j
 public class DefaultMonitorService implements MonitorService {
-
-    private static final String CURRENT_PAGE = "currentPage";
-    private static final String CURRENT_PAGE_ITEMS = "currentPageItems";
-    private static final String TOTAL_PAGES = "totalPages";
-    private static final String TOTAL_ELEMENTS = "totalElements";
 
     private static final String TARGETS_ODER_FIELD = "createdAt";
     private static final String CHECK_RESULTS_ODER_FIELD = "createdAt";
@@ -72,14 +68,13 @@ public class DefaultMonitorService implements MonitorService {
                                 .toList()
                 )
                 .metadata(
-                        Map.of(
-                                CURRENT_PAGE, result.getNumber(),
-                                CURRENT_PAGE_ITEMS, result.getContent().size(),
-                                TOTAL_PAGES, result.getTotalPages(),
-                                TOTAL_ELEMENTS, result.getTotalElements()
-                        )
-                )
-                .build();
+                        Metadata.builder()
+                                .currentPage(result.getNumber())
+                                .currentPageItems(result.getContent().size())
+                                .totalPages(result.getTotalPages())
+                                .totalElements(result.getTotalElements())
+                                .build()
+                ).build();
     }
 
     @Override
@@ -127,12 +122,12 @@ public class DefaultMonitorService implements MonitorService {
                                 .toList()
                 )
                 .metadata(
-                        Map.of(
-                                CURRENT_PAGE, result.getNumber(),
-                                CURRENT_PAGE_ITEMS, result.getContent().size(),
-                                TOTAL_PAGES, result.getTotalPages(),
-                                TOTAL_ELEMENTS, result.getTotalElements()
-                        )
+                        Metadata.builder()
+                                .currentPage(result.getNumber())
+                                .currentPageItems(result.getContent().size())
+                                .totalPages(result.getTotalPages())
+                                .totalElements(result.getTotalElements())
+                                .build()
                 )
                 .build();
 

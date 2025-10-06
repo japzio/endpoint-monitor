@@ -1,21 +1,20 @@
 package com.japzio.monitor.model.dto;
 
-import com.japzio.monitor.entity.Target;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.Map;
-
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAllTargetsResponse {
+public class Metadata {
 
-    List<TargetResponse> targets;
-    Metadata metadata;
+    private Integer currentPage;
+    private Integer currentPageItems;
+    private Integer totalPages;
+    private Long totalElements;
 
 }

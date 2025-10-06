@@ -15,6 +15,6 @@ import java.util.Map;
 public class GetAllCheckResultsResponse {
 
     List<CheckResultResponse> checkResults;
-    Map<String, Object> metadata;
+    Metadata metadata;
 
 }
