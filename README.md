@@ -2,6 +2,8 @@
 
 `endpoint-monitor` - Simple sefl-hosted endpoint monitoring supports curl(java-curl), ping(InetAddress.isReachable(..)) and telnet(commons-net TelnetClient)
 
+Note: This is purely rest api interaction. WebUI is still to follow :-D
+
 # Tech Stack
 
 - Java 21

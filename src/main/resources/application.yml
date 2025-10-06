@@ -4,6 +4,17 @@ spring:
   application:
     name: endpoint-monitor
 
+info:
+  app:
+    name: ${spring.application.name}
+    description: Endpoint Monitor Service
+    version: ${project.version}
+  build:
+    artifact: @project.artifactId@
+    name: @project.name@
+  java:
+    version: @java.version@
+
 management:
   endpoints:
     web:
