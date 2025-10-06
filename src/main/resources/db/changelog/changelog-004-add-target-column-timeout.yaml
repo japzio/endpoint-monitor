@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: add_timeout_column_to_targets
+      author: japzio
+      changes:
+        - addColumn:
+            tableName: targets
+            columns:
+              - column:
+                  name: timeout
+                  type: BIGINT
+                  constraints:
+                    nullable: true

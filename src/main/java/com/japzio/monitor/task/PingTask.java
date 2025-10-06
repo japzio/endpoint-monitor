@@ -2,6 +2,7 @@ package com.japzio.monitor.task;
 
 import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.properties.MonitorProperties;
 import com.japzio.monitor.repository.CheckResultRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,26 +17,32 @@ public class PingTask implements Runnable {
 
     private final Target target;
     private final CheckResultRepository checkResultRepository;
+    private final MonitorProperties monitorProperties;
 
     public PingTask(
             Target target,
-            CheckResultRepository checkResultRepository
+            CheckResultRepository checkResultRepository,
+            MonitorProperties monitorProperties
     ) {
         this.target = target;
         this.checkResultRepository = checkResultRepository;
+        this.monitorProperties = monitorProperties;
     }
 
     @Override
     public void run() {
         String targetEndpoint = target.getEndpoint();
+        var timeout = target.getTimeout() != null && target.getTimeout() > monitorProperties.getMaxTimeout()
+                ? target.getTimeout() : monitorProperties.getMaxTimeout();
         log.info("runnable task - ping - start targetId={}", target.getId());
+        log.info("ping task={}, timeout={}", targetEndpoint, timeout);
         try {
             var status = "unset";
 
             InetAddress inet = InetAddress.getByName(targetEndpoint);
 
             System.out.println("Pinging " + targetEndpoint + "...");
-            boolean reachable = inet.isReachable(5000); // timeout in ms
+            boolean reachable = inet.isReachable(Math.toIntExact(timeout)); // timeout in ms
 
             if (reachable) {
                 status = "Ok";

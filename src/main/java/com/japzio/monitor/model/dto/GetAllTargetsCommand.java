@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class GetAllTargetsCommand {
     private Integer size;
     private Integer page;
+    private String order;
 }

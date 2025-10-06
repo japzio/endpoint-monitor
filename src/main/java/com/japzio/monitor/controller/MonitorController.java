@@ -35,10 +35,12 @@ public class MonitorController {
     @GetMapping("/targets")
     public GetAllTargetsResponse getTargets(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "DESC") String order
     ) {
         return monitorService.getAllTargets(
                 GetAllTargetsCommand.builder()
+                        .order(order)
                         .page(page)
                         .size(size)
                         .build()
@@ -58,13 +60,15 @@ public class MonitorController {
     public GetAllCheckResultsResponse getTargetByIdCheckResults(
             @PathVariable("target-id") String targetId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "DESC") String order
     ) {
         return monitorService.getAllTargetCheckResults(
                 GetAllCheckResultsCommand.builder()
                         .targetId(UUID.fromString(targetId))
                         .page(page)
                         .size(size)
+                        .order(order)
                         .build()
         );
     }

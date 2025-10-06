@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changelog-002-set-enable-default-true.yaml
   - include:
       file: db/changelog/changelog-003-update-targets-table-method-check.yaml
+  - include:
+      file: db/changelog/changelog-004-add-target-column-timeout.yaml
