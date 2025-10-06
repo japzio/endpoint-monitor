@@ -39,4 +39,6 @@ public class Target {
 
     @Column(insertable = false)
     private Timestamp createdAt;
+
+    private Long timeout;
 }

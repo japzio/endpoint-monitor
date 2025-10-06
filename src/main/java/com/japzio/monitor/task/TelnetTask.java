@@ -2,6 +2,7 @@ package com.japzio.monitor.task;
 
 import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.properties.MonitorProperties;
 import com.japzio.monitor.repository.CheckResultRepository;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.slf4j.Logger;
@@ -19,20 +20,27 @@ public class TelnetTask implements Runnable {
 
     private final Target target;
     private final CheckResultRepository checkResultRepository;
+    private final MonitorProperties monitorProperties;
 
     public TelnetTask(
            Target target,
-           CheckResultRepository checkResultRepository
+           CheckResultRepository checkResultRepository,
+           MonitorProperties monitorProperties
     ) {
         this.target = target;
         this.checkResultRepository = checkResultRepository;
+        this.monitorProperties = monitorProperties;
     }
 
     @Override
     public void run() {
         String targetEndpoint = target.getEndpoint();
+        var timeout = target.getTimeout() != null && target.getTimeout() > monitorProperties.getMaxTimeout()
+                ? target.getTimeout() : monitorProperties.getMaxTimeout();
         TelnetClient telnet = new TelnetClient();
+        telnet.setDefaultTimeout(Math.toIntExact(timeout));
         log.info("runnable task - telnet - start targetId={}", target.getId());
+        log.info("curl task={}, timeout={}", targetEndpoint, timeout);
         String status = "OK";
         try {
             String[] targetEndpointSplit = targetEndpoint.split(":");

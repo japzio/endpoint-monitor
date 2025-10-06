@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -33,6 +34,9 @@ public class DefaultMonitorService implements MonitorService {
     private static final String CURRENT_PAGE_ITEMS = "currentPageItems";
     private static final String TOTAL_PAGES = "totalPages";
     private static final String TOTAL_ELEMENTS = "totalElements";
+
+    private static final String TARGETS_ODER_FIELD = "createdAt";
+    private static final String CHECK_RESULTS_ODER_FIELD = "createdAt";
 
     private final MonitorValidatorService monitorValidatorService;
     private final TargetRepository targetRepository;
@@ -50,7 +54,14 @@ public class DefaultMonitorService implements MonitorService {
 
     public GetAllTargetsResponse getAllTargets(GetAllTargetsCommand command) {
 
-        var pageRequest = PageRequest.of(command.getPage(), command.getSize());
+        var pageRequest = PageRequest.of(
+                command.getPage(),
+                command.getSize(),
+                Sort.by(
+                        Sort.Direction.valueOf(command.getOrder()),
+                        TARGETS_ODER_FIELD
+                )
+        );
 
         Page<Target> result = targetRepository.findAll(pageRequest);
 
@@ -98,7 +109,14 @@ public class DefaultMonitorService implements MonitorService {
     @Override
     public GetAllCheckResultsResponse getAllTargetCheckResults(GetAllCheckResultsCommand command) {
 
-        var pageRequest = PageRequest.of(command.getPage(), command.getSize());
+        var pageRequest = PageRequest.of(
+                command.getPage(),
+                command.getSize(),
+                Sort.by(
+                        Sort.Direction.valueOf(command.getOrder()),
+                        CHECK_RESULTS_ODER_FIELD
+                )
+        );
 
         Page<CheckResult> result = checkResultRepository.findAllByTargetId(command.getTargetId(), pageRequest);
 

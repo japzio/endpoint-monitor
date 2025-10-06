@@ -1,6 +1,7 @@
 package com.japzio.monitor.runner;
 
 import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.properties.MonitorProperties;
 import com.japzio.monitor.repository.CheckResultRepository;
 import com.japzio.monitor.repository.TargetRepository;
 import com.japzio.monitor.task.CurlTask;
@@ -24,13 +25,17 @@ public class TaskRunner {
 
     private final TargetRepository targetRepository;
     private final CheckResultRepository checkResultRepository;
+    private final MonitorProperties monitorProperties;
 
     TaskRunner(
             @Autowired TargetRepository targetRepository,
-            @Autowired CheckResultRepository checkResultRepository
+            @Autowired CheckResultRepository checkResultRepository,
+            @Autowired MonitorProperties monitorProperties
+
     ) {
         this.targetRepository = targetRepository;
         this.checkResultRepository = checkResultRepository;
+        this.monitorProperties = monitorProperties;
     }
 
     @Scheduled(cron = "${monitor.cron-expression}")
@@ -56,15 +61,15 @@ public class TaskRunner {
             switch(target.getMethod()) {
                 case CURL:
                     log.info("action=submitTask, info=CurlTask");
-                    executorService.submit(new CurlTask(target, checkResultRepository));
+                    executorService.submit(new CurlTask(target, checkResultRepository, monitorProperties));
                     break;
                 case PING:
                     log.info("action=submitTask, info=PingTask");
-                    executorService.submit(new PingTask(target, checkResultRepository));
+                    executorService.submit(new PingTask(target, checkResultRepository, monitorProperties));
                     break;
                 case TELNET:
                     log.info("action=submitTask, info=TelnetTask");
-                    executorService.submit(new TelnetTask(target, checkResultRepository));
+                    executorService.submit(new TelnetTask(target, checkResultRepository, monitorProperties));
                     break;
                 default:
                     log.warn("unsupported method");

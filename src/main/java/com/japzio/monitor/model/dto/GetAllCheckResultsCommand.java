@@ -15,4 +15,5 @@ public class GetAllCheckResultsCommand {
     private UUID targetId;
     private Integer size;
     private Integer page;
+    private String order;
 }
