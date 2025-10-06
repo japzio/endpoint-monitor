@@ -87,7 +87,6 @@ CREATE TABLE public.targets (
     method character varying(10) CONSTRAINT endpoints_method_not_null NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     enabled boolean DEFAULT true NOT NULL,
-    CONSTRAINT endpoints_method_check CHECK (((method)::text = ANY (ARRAY[('PING'::character varying)::text, ('CURL'::character varying)::text]))),
     CONSTRAINT method_check CHECK (((method)::text = ANY ((ARRAY['PING'::character varying, 'CURL'::character varying])::text[])))
 );
 

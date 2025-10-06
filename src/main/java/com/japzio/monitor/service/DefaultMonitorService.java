@@ -97,7 +97,7 @@ public class DefaultMonitorService implements MonitorService {
         targetRepository.save(target);
 
         return AddTargetResponse.builder()
-                .status("OK")
+                .id(target.getId().toString())
                 .build();
     }
 
