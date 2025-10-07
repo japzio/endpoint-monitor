@@ -1,15 +1,10 @@
 package com.japzio.monitor.controller;
 
 import com.japzio.monitor.model.command.AddTargetCommand;
-import com.japzio.monitor.model.dto.AddTargetRequest;
-import com.japzio.monitor.model.dto.AddTargetResponse;
-import com.japzio.monitor.model.dto.GetAllCheckResultsCommand;
-import com.japzio.monitor.model.dto.GetAllCheckResultsResponse;
-import com.japzio.monitor.model.dto.GetAllTargetsCommand;
-import com.japzio.monitor.model.dto.GetAllTargetsResponse;
+import com.japzio.monitor.model.dto.*;
 import com.japzio.monitor.service.MonitorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +46,13 @@ public class MonitorController {
         );
     }
 
+    @GetMapping("/targets/{target-id}")
+    public TargetResponse getTargets(
+         @PathVariable("target-id") @Valid @org.hibernate.validator.constraints.UUID String targetId
+    ) {
+        return monitorService.getTarget(targetId);
+    }
+
     @PostMapping("/targets")
     public ResponseEntity<AddTargetResponse> addNewTarget(
             @RequestBody AddTargetRequest request
@@ -66,7 +68,7 @@ public class MonitorController {
                 .toUri();
 
         return ResponseEntity
-                .created(URI.create(""))
+                .created(location)
                 .body(response);
     }
 

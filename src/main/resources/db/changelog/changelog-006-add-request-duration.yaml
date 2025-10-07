@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add_duration_column
+      author: japzio
+      changes:
+        - addColumn:
+            tableName: check_results
+            columns:
+              - column:
+                  name: duration
+                  type: INTEGER
+                  constraints:
+                    nullable: true  # Set to false if you want it non-nullable
+                  remarks: Duration of request completion in milliseconds

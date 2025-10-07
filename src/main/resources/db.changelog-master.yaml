@@ -9,3 +9,8 @@ databaseChangeLog:
       file: db/changelog/changelog-004-add-target-column-timeout.yaml
   - include:
       file: db/changelog/changelog-005-add-target-id-index.yaml
+  - include:
+      file: db/changelog/changelog-006-add-request-duration.yaml
+  - include:
+      file: db/changelog/changelog-007-add-description.yaml
+

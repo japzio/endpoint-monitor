@@ -4,19 +4,21 @@ import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
 import com.japzio.monitor.properties.MonitorProperties;
 import com.japzio.monitor.repository.CheckResultRepository;
+import com.sun.jdi.IncompatibleThreadStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 
-public class PingTask implements Runnable {
+public class PingTask extends BaseTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PingTask.class);
 
     private final Target target;
-    private final CheckResultRepository checkResultRepository;
     private final MonitorProperties monitorProperties;
 
     public PingTask(
@@ -24,8 +26,8 @@ public class PingTask implements Runnable {
             CheckResultRepository checkResultRepository,
             MonitorProperties monitorProperties
     ) {
+        super(checkResultRepository);
         this.target = target;
-        this.checkResultRepository = checkResultRepository;
         this.monitorProperties = monitorProperties;
     }
 
@@ -42,8 +44,9 @@ public class PingTask implements Runnable {
             InetAddress inet = InetAddress.getByName(targetEndpoint);
 
             System.out.println("Pinging " + targetEndpoint + "...");
+            var start = Instant.now();
             boolean reachable = inet.isReachable(Math.toIntExact(timeout)); // timeout in ms
-
+            var duration = Duration.between(start, Instant.now()).getSeconds();
             if (reachable) {
                 status = "Ok";
                 log.info("ping exec - {} is reachable.", targetEndpoint);
@@ -55,13 +58,15 @@ public class PingTask implements Runnable {
             log.info("ping exec - {}", targetEndpoint);
             log.info("ping result - {}", status);
 
-            checkResultRepository.save(
+            saveCheckResult(
                     CheckResult.builder()
                             .status(status)
                             .targetId(target.getId())
+                            .duration(reachable ? (int) duration : null)
                             .createdAt(Timestamp.from(Instant.now()))
                             .build()
             );
+
         } catch (Exception e) {
             e.printStackTrace();
         }
