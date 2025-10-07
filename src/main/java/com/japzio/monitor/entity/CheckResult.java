@@ -25,5 +25,7 @@ public class CheckResult {
     private UUID id;
     private UUID targetId;
     private String status;
+    private String description;
+    private Integer duration;
     private Timestamp createdAt;
 }
