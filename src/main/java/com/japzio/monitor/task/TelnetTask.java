@@ -42,7 +42,8 @@ public class TelnetTask  extends BaseTask implements Runnable {
         telnet.setDefaultTimeout(Math.toIntExact(timeout));
         log.info("runnable task - telnet - start targetId={}", target.getId());
         log.info("curl task={}, timeout={}", targetEndpoint, timeout);
-        String status = CheckResultsStatus.OK.name();
+        var status = CheckResultsStatus.OK.name();
+        var description = "";
         var start = Instant.now();
         try {
             String[] targetEndpointSplit = targetEndpoint.split(":");
@@ -69,6 +70,7 @@ public class TelnetTask  extends BaseTask implements Runnable {
 
         } catch (IOException e) {
             status = CheckResultsStatus.NOT_OK.name();
+            description = "Error connecting or communicating";
             log.error("Error connecting or communicating: {}", e.getMessage());
         } finally {
             try {
@@ -77,21 +79,21 @@ public class TelnetTask  extends BaseTask implements Runnable {
                 }
             } catch (IOException e) {
                 status = CheckResultsStatus.NOT_OK.name();
+                description = "Error disconnecting";
                 log.error("Error disconnecting: {}", e.getMessage());
             }
         }
 
         log.info("telnet - {}", targetEndpoint);
         log.info("telnet result - {}", status);
+        var duration = Duration.between(start, Instant.now()).getSeconds();
         saveCheckResult(
                 CheckResult.builder()
                         .status(status)
                         .targetId(target.getId())
-                        .duration(
-                                status.equals(CheckResultsStatus.OK.name())
-                                        ? (int) Duration.between(start, Instant.now()).getSeconds() : null
-                        )
+                        .duration(status.equals(CheckResultsStatus.OK.name()) ? (int) duration : null)
                         .createdAt(Timestamp.from(Instant.now()))
+                        .description(status.equalsIgnoreCase(CheckResultsStatus.NOT_OK.name())? description : "")
                         .build()
         );
         log.info("runnable task - telnet - done");

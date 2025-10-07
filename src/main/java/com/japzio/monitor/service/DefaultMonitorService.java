@@ -16,6 +16,7 @@ import com.japzio.monitor.model.dto.Metadata;
 import com.japzio.monitor.model.dto.TargetResponse;
 import com.japzio.monitor.repository.CheckResultRepository;
 import com.japzio.monitor.repository.TargetRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -87,6 +88,18 @@ public class DefaultMonitorService implements MonitorService {
                                 .totalElements(result.getTotalElements())
                                 .build()
                 ).build();
+    }
+
+    @Override
+    @Transactional
+    public void removeTarget(String targetId) {
+        log.info("action=removeTarget, info=checkBeforeRemoving, targetId={}", targetId);
+        if(!targetRepository.existsById(UUID.fromString(targetId))) {
+            log.error("action=removeTarget, error=deleteTargetFailed, targetId={}", targetId);
+            throw new TargetNotFoundException("Attempting to delete non existent targetId" + targetId);
+        }
+        log.info("action=removeTarget, info=removeTarget, targetId={}", targetId);
+        targetRepository.deleteById(UUID.fromString(targetId));
     }
 
     @Override

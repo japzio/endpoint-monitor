@@ -16,10 +16,9 @@ public abstract class BaseTask {
     }
 
     protected void saveCheckResult(CheckResult checkResult) {
-        log.info("action=saveCheckResult, info=start, targetId={}, resultId{}",
-                checkResult.getTargetId(),  checkResult.getId());
-        checkResultRepository.save(checkResult);
-        log.info("action=saveCheckResult, info=done");
+        log.info("action=saveCheckResult, info=start, targetId={}", checkResult.getTargetId());
+        var savedCheckResult = checkResultRepository.save(checkResult);
+        log.info("action=saveCheckResult, info=done, resultId={}", savedCheckResult.getId());
     }
 
 }

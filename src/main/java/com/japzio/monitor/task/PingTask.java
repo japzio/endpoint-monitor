@@ -39,38 +39,45 @@ public class PingTask extends BaseTask implements Runnable {
                 ? target.getTimeout() : monitorProperties.getMaxTimeout();
         log.info("runnable task - ping - start targetId={}", target.getId());
         log.info("ping task={}, timeout={}", targetEndpoint, timeout);
+
+        var status = CheckResultsStatus.OK.name();
+        var description = "";
+        System.out.println("Pinging " + targetEndpoint + "...");
+        var start = Instant.now();
+        var duration = 0L;
         try {
-            var status = "unset";
-
             InetAddress inet = InetAddress.getByName(targetEndpoint);
-
-            System.out.println("Pinging " + targetEndpoint + "...");
-            var start = Instant.now();
             boolean reachable = inet.isReachable(Math.toIntExact(timeout)); // timeout in ms
-            var duration = Duration.between(start, Instant.now()).getSeconds();
+            duration = Duration.between(start, Instant.now()).getSeconds();
             if (reachable) {
                 status = CheckResultsStatus.OK.name();
                 log.info("ping exec - {} is reachable.", targetEndpoint);
             } else {
                 status = CheckResultsStatus.NOT_OK.name();
+                description = "NOT reachable.";
                 log.info("ping exec - {} is NOT reachable.", targetEndpoint);
             }
 
             log.info("ping exec - {}", targetEndpoint);
             log.info("ping result - {}", status);
 
-            saveCheckResult(
-                    CheckResult.builder()
-                            .status(status)
-                            .targetId(target.getId())
-                            .duration(reachable ? (int) duration : null)
-                            .createdAt(Timestamp.from(Instant.now()))
-                            .build()
-            );
-
         } catch (Exception e) {
+            status = CheckResultsStatus.NOT_OK.name();
+            description = e.getMessage();
+            log.error("ping exec - {} exception occurred!", targetEndpoint);
             e.printStackTrace();
         }
+
+        saveCheckResult(
+                CheckResult.builder()
+                        .status(status)
+                        .targetId(target.getId())
+                        .duration(status.equals(CheckResultsStatus.OK.name()) ? (int) duration : null)
+                        .createdAt(Timestamp.from(Instant.now()))
+                        .description(status.equals(CheckResultsStatus.NOT_OK.name()) ? description : "")
+                        .build()
+        );
+
         log.info("runnable task - ping - done");
     }
 }

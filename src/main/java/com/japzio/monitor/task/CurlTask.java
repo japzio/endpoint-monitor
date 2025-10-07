@@ -49,6 +49,7 @@ public class CurlTask extends  BaseTask implements Runnable {
                         .duration(
                                 curlRequest.getHttpCode() == 200 ? (int) curlRequest.getExecTime() : null)
                         .createdAt(Timestamp.from(Instant.now()))
+                        .description(status.equals(CheckResultsStatus.NOT_OK.name()) ? String.valueOf(curlRequest.getHttpCode()) : "")
                         .build()
         );
         log.info("runnable task - curl - done");
