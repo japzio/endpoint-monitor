@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: modify-endpoint-type-to-varchar
+      author: grok
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - columnExists:
+                tableName: targets
+                columnName: endpoint
+                type: varchar(255)
+      changes:
+        - modifyDataType:
+            tableName: targets
+            columnName: endpoint
+            newDataType: varchar(255)
+      rollback:
+        - modifyDataType:
+            tableName: targets
+            columnName: endpoint
+            newDataType: text

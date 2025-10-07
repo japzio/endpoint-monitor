@@ -2,6 +2,7 @@ package com.japzio.monitor.task;
 
 import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.model.CheckResultsStatus;
 import com.japzio.monitor.properties.MonitorProperties;
 import com.japzio.monitor.repository.CheckResultRepository;
 import com.sun.jdi.IncompatibleThreadStateException;
@@ -48,10 +49,10 @@ public class PingTask extends BaseTask implements Runnable {
             boolean reachable = inet.isReachable(Math.toIntExact(timeout)); // timeout in ms
             var duration = Duration.between(start, Instant.now()).getSeconds();
             if (reachable) {
-                status = "Ok";
+                status = CheckResultsStatus.OK.name();
                 log.info("ping exec - {} is reachable.", targetEndpoint);
             } else {
-                status = "Unreachable";
+                status = CheckResultsStatus.NOT_OK.name();
                 log.info("ping exec - {} is NOT reachable.", targetEndpoint);
             }
 
