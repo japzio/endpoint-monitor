@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-unique-endpoint-constraint
+      author: japzio
+      changes:
+        - addUniqueConstraint:
+            tableName: targets
+            columnNames: endpoint
+            constraintName: unique_endpoint
+      rollback:
+        - dropUniqueConstraint:
+            tableName: targets
+            constraintName: unique_endpoint

@@ -28,6 +28,7 @@ public class Target {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
+    @Column(nullable = false, length = 255)
     private String endpoint;
 
     @Enumerated(EnumType.STRING)

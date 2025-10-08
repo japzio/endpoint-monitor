@@ -1,16 +1,14 @@
 package com.japzio.monitor.service;
 
 import com.japzio.monitor.model.command.AddTargetCommand;
-import com.japzio.monitor.model.dto.AddTargetResponse;
-import com.japzio.monitor.model.dto.GetAllCheckResultsCommand;
-import com.japzio.monitor.model.dto.GetAllCheckResultsResponse;
-import com.japzio.monitor.model.dto.GetAllTargetsCommand;
-import com.japzio.monitor.model.dto.GetAllTargetsResponse;
+import com.japzio.monitor.model.dto.*;
 
 public interface MonitorService {
 
-    GetAllTargetsResponse getAllTargets(GetAllTargetsCommand command);
     AddTargetResponse addNewTarget(AddTargetCommand command);
+    TargetResponse getTarget(String targetId);
+    GetAllTargetsResponse getAllTargets(GetAllTargetsCommand command);
+    void removeTarget(String targetId);
     GetAllCheckResultsResponse getAllTargetCheckResults(GetAllCheckResultsCommand command);
 
 }

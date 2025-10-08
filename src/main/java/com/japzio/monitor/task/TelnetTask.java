@@ -2,6 +2,7 @@ package com.japzio.monitor.task;
 
 import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.model.CheckResultsStatus;
 import com.japzio.monitor.properties.MonitorProperties;
 import com.japzio.monitor.repository.CheckResultRepository;
 import org.apache.commons.net.telnet.TelnetClient;
@@ -12,14 +13,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 
-public class TelnetTask implements Runnable {
+public class TelnetTask  extends BaseTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PingTask.class);
 
     private final Target target;
-    private final CheckResultRepository checkResultRepository;
     private final MonitorProperties monitorProperties;
 
     public TelnetTask(
@@ -27,8 +28,8 @@ public class TelnetTask implements Runnable {
            CheckResultRepository checkResultRepository,
            MonitorProperties monitorProperties
     ) {
+        super(checkResultRepository);
         this.target = target;
-        this.checkResultRepository = checkResultRepository;
         this.monitorProperties = monitorProperties;
     }
 
@@ -41,7 +42,9 @@ public class TelnetTask implements Runnable {
         telnet.setDefaultTimeout(Math.toIntExact(timeout));
         log.info("runnable task - telnet - start targetId={}", target.getId());
         log.info("curl task={}, timeout={}", targetEndpoint, timeout);
-        String status = "OK";
+        var status = CheckResultsStatus.OK.name();
+        var description = "";
+        var start = Instant.now();
         try {
             String[] targetEndpointSplit = targetEndpoint.split(":");
             if(targetEndpointSplit.length != 2) {
@@ -66,26 +69,31 @@ public class TelnetTask implements Runnable {
             }
 
         } catch (IOException e) {
-            status = "Error Communicating";
-            System.err.println("Error connecting or communicating: " + e.getMessage());
+            status = CheckResultsStatus.NOT_OK.name();
+            description = "Error connecting or communicating";
+            log.error("Error connecting or communicating: {}", e.getMessage());
         } finally {
             try {
                 if (telnet.isConnected()) {
                     telnet.disconnect();
                 }
             } catch (IOException e) {
-                status = "Error Disconnecting";
-                System.err.println("Error disconnecting: " + e.getMessage());
+                status = CheckResultsStatus.NOT_OK.name();
+                description = "Error disconnecting";
+                log.error("Error disconnecting: {}", e.getMessage());
             }
         }
 
         log.info("telnet - {}", targetEndpoint);
         log.info("telnet result - {}", status);
-        checkResultRepository.save(
+        var duration = Duration.between(start, Instant.now()).getSeconds();
+        saveCheckResult(
                 CheckResult.builder()
-                        .status(String.valueOf(status))
+                        .status(status)
                         .targetId(target.getId())
+                        .duration(status.equals(CheckResultsStatus.OK.name()) ? (int) duration : null)
                         .createdAt(Timestamp.from(Instant.now()))
+                        .description(status.equalsIgnoreCase(CheckResultsStatus.NOT_OK.name())? description : "")
                         .build()
         );
         log.info("runnable task - telnet - done");

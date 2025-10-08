@@ -18,6 +18,7 @@ public class CheckResultResponse {
     private UUID targetId;
     private String status;
     private Instant createAt;
+    private String description;
 
     public static CheckResultResponse fromEntity(CheckResult checkResult) {
         return CheckResultResponse.builder()
@@ -25,6 +26,7 @@ public class CheckResultResponse {
                 .targetId(checkResult.getTargetId())
                 .status(checkResult.getStatus())
                 .createAt(checkResult.getCreatedAt().toInstant())
+                .description(checkResult.getDescription())
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package com.japzio.monitor.task;
 
 import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.model.CheckResultsStatus;
 import com.japzio.monitor.properties.MonitorProperties;
 import com.japzio.monitor.repository.CheckResultRepository;
 import com.roxstudio.utils.CUrl;
@@ -11,12 +12,11 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-public class CurlTask implements Runnable {
+public class CurlTask extends  BaseTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(PingTask.class);
 
     private final Target target;
-    private final CheckResultRepository checkResultRepository;
     private final MonitorProperties monitorProperties;
 
     public CurlTask(
@@ -24,8 +24,9 @@ public class CurlTask implements Runnable {
            CheckResultRepository checkResultRepository,
            MonitorProperties monitorProperties
     ) {
+        super(checkResultRepository);
+
         this.target = target;
-        this.checkResultRepository = checkResultRepository;
         this.monitorProperties = monitorProperties;
     }
 
@@ -40,11 +41,15 @@ public class CurlTask implements Runnable {
         curlRequest.exec();
         log.info("curl exec={}, timeout={}", targetEndpoint, timeout);
         log.info("curl result - {}", curlRequest.getHttpCode());
-        checkResultRepository.save(
+        var status = curlRequest.getHttpCode() == 200 ? CheckResultsStatus.OK.name() : CheckResultsStatus.NOT_OK.name();
+        saveCheckResult(
                 CheckResult.builder()
-                        .status(String.valueOf(curlRequest.getHttpCode()))
+                        .status(status)
                         .targetId(target.getId())
+                        .duration(
+                                curlRequest.getHttpCode() == 200 ? (int) curlRequest.getExecTime() : null)
                         .createdAt(Timestamp.from(Instant.now()))
+                        .description(status.equals(CheckResultsStatus.NOT_OK.name()) ? String.valueOf(curlRequest.getHttpCode()) : "")
                         .build()
         );
         log.info("runnable task - curl - done");

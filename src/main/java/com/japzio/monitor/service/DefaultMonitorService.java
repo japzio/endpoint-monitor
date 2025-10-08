@@ -3,6 +3,7 @@ package com.japzio.monitor.service;
 import com.japzio.monitor.entity.CheckResult;
 import com.japzio.monitor.entity.Target;
 import com.japzio.monitor.exception.AddNewTargetException;
+import com.japzio.monitor.exception.TargetNotFoundException;
 import com.japzio.monitor.model.command.AddTargetCommand;
 import com.japzio.monitor.model.dto.AddTargetRequest;
 import com.japzio.monitor.model.dto.AddTargetResponse;
@@ -15,6 +16,7 @@ import com.japzio.monitor.model.dto.Metadata;
 import com.japzio.monitor.model.dto.TargetResponse;
 import com.japzio.monitor.repository.CheckResultRepository;
 import com.japzio.monitor.repository.TargetRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -46,6 +49,16 @@ public class DefaultMonitorService implements MonitorService {
         this.monitorValidatorService = monitorValidatorService;
         this.targetRepository = targetRepository;
         this.checkResultRepository = checkResultRepository;
+    }
+
+    @Override
+    public TargetResponse getTarget(String targetId) {
+
+        var target = targetRepository.findById(UUID.fromString(targetId))
+                .orElseThrow(() -> new TargetNotFoundException(targetId));
+
+        return  TargetResponse.fromEntity(target);
+
     }
 
     public GetAllTargetsResponse getAllTargets(GetAllTargetsCommand command) {
@@ -75,6 +88,18 @@ public class DefaultMonitorService implements MonitorService {
                                 .totalElements(result.getTotalElements())
                                 .build()
                 ).build();
+    }
+
+    @Override
+    @Transactional
+    public void removeTarget(String targetId) {
+        log.info("action=removeTarget, info=checkBeforeRemoving, targetId={}", targetId);
+        if(!targetRepository.existsById(UUID.fromString(targetId))) {
+            log.error("action=removeTarget, error=deleteTargetFailed, targetId={}", targetId);
+            throw new TargetNotFoundException("Attempting to delete non existent targetId" + targetId);
+        }
+        log.info("action=removeTarget, info=removeTarget, targetId={}", targetId);
+        targetRepository.deleteById(UUID.fromString(targetId));
     }
 
     @Override

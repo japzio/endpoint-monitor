@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-status-check-constraint
+      author: japzio
+      preConditions:
+        - onFail: MARK_RAN
+          sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM information_schema.table_constraints WHERE constraint_name = 'status_check' AND table_name = 'check_results' AND constraint_type = 'CHECK';
+      changes:
+        - sql:
+            sql: ALTER TABLE check_results ADD CONSTRAINT status_check CHECK (status = ANY (ARRAY['OK'::character varying, 'NOT_OK'::character varying]));
+      rollback:
+        - sql:
+            sql: ALTER TABLE check_results DROP CONSTRAINT status_check;

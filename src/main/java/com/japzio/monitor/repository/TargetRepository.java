@@ -11,5 +11,6 @@ public interface TargetRepository extends JpaRepository<Target, Long> {
 
     List<Target> findAllByEnabledTrue();
     Optional<Target> findById(UUID id);
-
+    void deleteById(UUID id);
+    boolean existsById(UUID id);
 }
