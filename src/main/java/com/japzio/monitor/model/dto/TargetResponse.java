@@ -19,6 +19,7 @@ public class TargetResponse {
     private String endpoint;
     private SupportedMethods method;
     private Timestamp createdAt;
+    private Boolean enabled;
 
     public static TargetResponse fromEntity(Target target) {
         return TargetResponse.builder()
@@ -26,6 +27,7 @@ public class TargetResponse {
                 .endpoint(target.getEndpoint())
                 .method(SupportedMethods.valueOf(target.getMethod().name()))
                 .createdAt(target.getCreatedAt())
+                .enabled(target.getEnabled())
                 .build();
     }
 }

@@ -13,8 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -40,50 +44,84 @@ public class TaskRunner {
 
     @Scheduled(cron = "${monitor.cron-expression}")
     public void runJob() {
-
         var enabledTargets = targetRepository.findAllByEnabledTrue();
 
-        if(enabledTargets.isEmpty()) {
+        if (enabledTargets.isEmpty()) {
             log.warn("exiting... no \"enabled\" targets found");
             return;
         }
 
         log.info("run job - start");
-        ExecutorService executorService = Executors.newFixedThreadPool(enabledTargets.size());
+        // Cap thread pool size to prevent resource exhaustion
+        int MAX_THREADS = 10; // Adjust based on system capacity
+        try (ExecutorService executorService = Executors.newFixedThreadPool(Math.min(enabledTargets.size(), MAX_THREADS))) {
+            ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executorService;
+            List<Future<?>> futures = new ArrayList<>();
 
-        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executorService;
-
-        log.info("executorService started. coreSize={}, active={}, completedTask={}",
-                threadPoolExecutor.getCorePoolSize(), threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
-
-        for (Target target: enabledTargets) {
-            log.info("submit Task({})", target.getEndpoint());
-            switch(target.getMethod()) {
-                case CURL:
-                    log.info("action=submitTask, info=CurlTask");
-                    executorService.submit(new CurlTask(target, checkResultRepository, monitorProperties));
-                    break;
-                case PING:
-                    log.info("action=submitTask, info=PingTask");
-                    executorService.submit(new PingTask(target, checkResultRepository, monitorProperties));
-                    break;
-                case TELNET:
-                    log.info("action=submitTask, info=TelnetTask");
-                    executorService.submit(new TelnetTask(target, checkResultRepository, monitorProperties));
-                    break;
-                default:
-                    log.warn("unsupported method");
-
+            // Submit tasks and track their Futures
+            for (Target target : enabledTargets) {
+                log.info("submit Task({})", target.getEndpoint());
+                try {
+                    switch (target.getMethod()) {
+                        case CURL:
+                            log.info("action=submitTask, info=CurlTask");
+                            futures.add(executorService.submit(new CurlTask(target, checkResultRepository, monitorProperties)));
+                            break;
+                        case PING:
+                            log.info("action=submitTask, info=PingTask");
+                            futures.add(executorService.submit(new PingTask(target, checkResultRepository, monitorProperties)));
+                            break;
+                        case TELNET:
+                            log.info("action=submitTask, info=TelnetTask");
+                            futures.add(executorService.submit(new TelnetTask(target, checkResultRepository, monitorProperties)));
+                            break;
+                        default:
+                            log.warn("unsupported method: {}", target.getMethod());
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to submit task for target: {}", target.getEndpoint(), e);
+                }
             }
-        }
 
-        try {
-            if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+            // Log thread pool stats after submitting tasks
+            log.info("executorService tasks submitted. coreSize={}, active={}, completedTask={}",
+                    threadPoolExecutor.getCorePoolSize(), threadPoolExecutor.getActiveCount(), threadPoolExecutor.getCompletedTaskCount());
+
+            // Wait for tasks to complete with a timeout aligned to max task duration
+            executorService.shutdown();
+            try {
+                // Allow up to 32 seconds to account for task timeout (30s) + scheduling overhead
+                if (!executorService.awaitTermination(monitorProperties.getMaxTimeout(), TimeUnit.SECONDS)) {
+                    log.warn("Tasks did not complete within timeout, forcing shutdown");
+                    executorService.shutdownNow();
+                    // Log tasks that were interrupted
+                    for (Future<?> future : futures) {
+                        if (!future.isDone()) {
+                            log.warn("Task interrupted: {}", future);
+                        }
+                    }
+                }
+            } catch (InterruptedException e) {
+                log.warn("Interrupted while waiting for tasks to complete");
                 executorService.shutdownNow();
+                Thread.currentThread().interrupt(); // Restore interrupted status
             }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
+
+            // Check for task failures
+            for (Future<?> future : futures) {
+                try {
+                    future.get(0, TimeUnit.SECONDS); // Check if task completed successfully
+                } catch (ExecutionException e) {
+                    log.error("Task failed with exception", e.getCause());
+                } catch (Exception e) {
+                    log.error("Error checking task completion", e);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Unexpected error during job execution", e);
         }
+
         log.info("run job - done");
     }
 }

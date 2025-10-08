@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
 
 public class CurlTask extends  BaseTask implements Runnable {
 
