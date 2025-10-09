@@ -18,6 +18,7 @@ public class CheckResultResponse {
     private UUID targetId;
     private String status;
     private Instant createAt;
+    private Integer duration;
     private String description;
 
     public static CheckResultResponse fromEntity(CheckResult checkResult) {
@@ -27,6 +28,7 @@ public class CheckResultResponse {
                 .status(checkResult.getStatus())
                 .createAt(checkResult.getCreatedAt().toInstant())
                 .description(checkResult.getDescription())
+                .duration(checkResult.getDuration())
                 .build();
     }
 }

@@ -42,7 +42,7 @@ public class TelnetTask  extends BaseTask implements Runnable {
         telnet.setDefaultTimeout(Math.toIntExact(timeout));
         log.info("runnable task - telnet - start targetId={}", target.getId());
         log.info("curl task={}, timeout={}", targetEndpoint, timeout);
-        var status = CheckResultsStatus.OK.name();
+        var status = CheckResultsStatus.NOT_OK.name();
         var description = "";
         var start = Instant.now();
         try {
@@ -67,9 +67,8 @@ public class TelnetTask  extends BaseTask implements Runnable {
                 System.out.print(new String(buffer, 0, bytesRead));
                 // You might need more sophisticated logic to determine when the response is complete
             }
-
+            status = CheckResultsStatus.OK.name();
         } catch (IOException e) {
-            status = CheckResultsStatus.NOT_OK.name();
             description = "Error connecting or communicating";
             log.error("Error connecting or communicating: {}", e.getMessage());
         } finally {
@@ -78,15 +77,14 @@ public class TelnetTask  extends BaseTask implements Runnable {
                     telnet.disconnect();
                 }
             } catch (IOException e) {
-                status = CheckResultsStatus.NOT_OK.name();
                 description = "Error disconnecting";
                 log.error("Error disconnecting: {}", e.getMessage());
             }
         }
 
         log.info("telnet - {}", targetEndpoint);
-        log.info("telnet result - {}", status);
         var duration = Duration.between(start, Instant.now()).getSeconds();
+        log.info("telnet result - {}, duration={}", status, duration);
         saveCheckResult(
                 CheckResult.builder()
                         .status(status)
