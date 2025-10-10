@@ -11,6 +11,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
+influx:
+  url: http://dummt:8086
+  token: dummy
+  org: myorg
+  bucket: monitoring
+
 logging:
   level:
     org.hibernate.SQL: debug

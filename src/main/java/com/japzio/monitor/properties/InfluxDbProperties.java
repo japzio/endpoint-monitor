@@ -4,12 +4,16 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Optional;
+
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "monitor")
-public class MonitorProperties {
+@ConfigurationProperties(prefix = "influx")
+public class InfluxDbProperties {
 
-    private String cronExpression;
-    private Long maxTimeout;
+    private String url;
+    private String token;
+    private String org;
+    private String bucket;
 
 }

@@ -1,4 +1,4 @@
-package com.japzio.monitor.entity;
+package com.japzio.monitor.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +24,7 @@ public class CheckResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
     private UUID targetId;
+    private String method;
     private String status;
     private String description;
     private Integer duration;

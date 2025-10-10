@@ -1,6 +1,6 @@
 package com.japzio.monitor.config;
 
-import com.japzio.monitor.model.dto.AddTargetRequest;
+import com.japzio.monitor.model.external.AddTargetRequest;
 import com.japzio.monitor.validator.AddCurlTargetRequestValidator;
 import com.japzio.monitor.validator.AddTelnetTargetRequestValidator;
 import com.japzio.monitor.validator.Validator;

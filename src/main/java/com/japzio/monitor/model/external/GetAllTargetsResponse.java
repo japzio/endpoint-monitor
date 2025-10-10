@@ -1,16 +1,19 @@
-package com.japzio.monitor.model.dto;
+package com.japzio.monitor.model.external;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAllTargetsCommand {
-    private Integer size;
-    private Integer page;
-    private String order;
+public class GetAllTargetsResponse {
+
+    List<TargetResponse> targets;
+    Metadata metadata;
+
 }

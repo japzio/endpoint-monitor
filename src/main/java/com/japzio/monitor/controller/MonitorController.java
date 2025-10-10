@@ -1,7 +1,8 @@
 package com.japzio.monitor.controller;
 
 import com.japzio.monitor.model.command.AddTargetCommand;
-import com.japzio.monitor.model.dto.*;
+import com.japzio.monitor.model.command.GetAllTargetsCommand;
+import com.japzio.monitor.model.external.*;
 import com.japzio.monitor.service.MonitorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.UUID;
 
 @RestController
 @Validated
@@ -79,23 +79,6 @@ public class MonitorController {
     ) {
         monitorService.removeTarget(targetId);
         return ResponseEntity.accepted().build();
-    }
-
-    @GetMapping("/targets/{target-id}/check-results")
-    public GetAllCheckResultsResponse getTargetByIdCheckResults(
-            @PathVariable("target-id") String targetId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "DESC") String order
-    ) {
-        return monitorService.getAllTargetCheckResults(
-                GetAllCheckResultsCommand.builder()
-                        .targetId(UUID.fromString(targetId))
-                        .page(page)
-                        .size(size)
-                        .order(order)
-                        .build()
-        );
     }
 
 }

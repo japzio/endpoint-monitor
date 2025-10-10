@@ -1,8 +1,8 @@
 package com.japzio.monitor.runner;
 
-import com.japzio.monitor.entity.Target;
+import com.influxdb.client.InfluxDBClient;
+import com.japzio.monitor.model.entity.Target;
 import com.japzio.monitor.properties.MonitorProperties;
-import com.japzio.monitor.repository.CheckResultRepository;
 import com.japzio.monitor.repository.TargetRepository;
 import com.japzio.monitor.task.CurlTask;
 import com.japzio.monitor.task.PingTask;
@@ -28,18 +28,19 @@ public class TaskRunner {
     private static final Logger log = LoggerFactory.getLogger(TaskRunner.class);
 
     private final TargetRepository targetRepository;
-    private final CheckResultRepository checkResultRepository;
     private final MonitorProperties monitorProperties;
+    private final InfluxDBClient influxDBClient;
 
     TaskRunner(
             @Autowired TargetRepository targetRepository,
-            @Autowired CheckResultRepository checkResultRepository,
-            @Autowired MonitorProperties monitorProperties
+
+            @Autowired MonitorProperties monitorProperties,
+            @Autowired InfluxDBClient influxDBClient
 
     ) {
         this.targetRepository = targetRepository;
-        this.checkResultRepository = checkResultRepository;
         this.monitorProperties = monitorProperties;
+        this.influxDBClient = influxDBClient;
     }
 
     @Scheduled(cron = "${monitor.cron-expression}")
@@ -65,15 +66,15 @@ public class TaskRunner {
                     switch (target.getMethod()) {
                         case CURL:
                             log.info("action=submitTask, info=CurlTask");
-                            futures.add(executorService.submit(new CurlTask(target, checkResultRepository, monitorProperties)));
+                            futures.add(executorService.submit(new CurlTask(target, monitorProperties, influxDBClient)));
                             break;
                         case PING:
                             log.info("action=submitTask, info=PingTask");
-                            futures.add(executorService.submit(new PingTask(target, checkResultRepository, monitorProperties)));
+                            futures.add(executorService.submit(new PingTask(target, monitorProperties, influxDBClient)));
                             break;
                         case TELNET:
                             log.info("action=submitTask, info=TelnetTask");
-                            futures.add(executorService.submit(new TelnetTask(target, checkResultRepository, monitorProperties)));
+                            futures.add(executorService.submit(new TelnetTask(target, monitorProperties, influxDBClient)));
                             break;
                         default:
                             log.warn("unsupported method: {}", target.getMethod());

@@ -2,14 +2,10 @@ package com.japzio.monitor.validator;
 
 import com.japzio.monitor.exception.AddNewTargetException;
 import com.japzio.monitor.model.SupportedMethods;
-import com.japzio.monitor.model.dto.AddTargetRequest;
+import com.japzio.monitor.model.external.AddTargetRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j

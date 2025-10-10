@@ -1,7 +1,7 @@
 package com.japzio.monitor.validator;
 
 import com.japzio.monitor.model.SupportedMethods;
-import com.japzio.monitor.model.dto.AddTargetRequest;
+import com.japzio.monitor.model.external.AddTargetRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.MalformedURLException;

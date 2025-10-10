@@ -1,7 +1,7 @@
 package com.japzio.monitor.service;
 
 import com.japzio.monitor.model.command.AddTargetCommand;
-import com.japzio.monitor.model.dto.AddTargetRequest;
+import com.japzio.monitor.model.external.AddTargetRequest;
 import com.japzio.monitor.validator.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

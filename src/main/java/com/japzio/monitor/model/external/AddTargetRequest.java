@@ -1,4 +1,4 @@
-package com.japzio.monitor.model.dto;
+package com.japzio.monitor.model.external;
 
 import com.japzio.monitor.model.SupportedMethods;
 import jakarta.validation.constraints.NotNull;

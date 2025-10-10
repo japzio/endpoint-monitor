@@ -1,6 +1,6 @@
 package com.japzio.monitor.controller;
 
-import com.japzio.monitor.model.dto.AddTargetResponse;
+import com.japzio.monitor.model.external.AddTargetResponse;
 import com.japzio.monitor.repository.TargetRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,11 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.InfluxDBContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -43,6 +45,24 @@ public class MonitorControllerV1Test {
         registry.add("spring.liquibase.url", postgres::getJdbcUrl);
         registry.add("spring.liquibase.user", postgres::getUsername);
         registry.add("spring.liquibase.password", postgres::getPassword);
+    }
+
+    @Container
+    static InfluxDBContainer<?> influxDBContainer = new InfluxDBContainer<>(
+            DockerImageName.parse("influxdb:2.7"))
+            .withEnv("DOCKER_INFLUXDB_INIT_MODE", "setup")
+            .withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
+            .withEnv("DOCKER_INFLUXDB_INIT_PASSWORD", "testpassword")
+            .withEnv("DOCKER_INFLUXDB_INIT_ORG", "testorg")
+            .withEnv("DOCKER_INFLUXDB_INIT_BUCKET", "testbucket")
+            .waitingFor(new HttpWaitStrategy());;
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        registry.add("influx.url", influxDBContainer::getUrl);
+        registry.add("influx.token", () -> influxDBContainer.getAdminToken().orElse("testpassword")); // Use the helper from Step 3
+        registry.add("influx.org", () -> "myorg");
+        registry.add("influx.bucket", () -> "endpointmonitoring");
     }
 
     @Autowired

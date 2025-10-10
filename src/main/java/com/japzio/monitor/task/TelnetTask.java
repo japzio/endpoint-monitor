@@ -1,10 +1,10 @@
 package com.japzio.monitor.task;
 
-import com.japzio.monitor.entity.CheckResult;
-import com.japzio.monitor.entity.Target;
+import com.influxdb.client.InfluxDBClient;
+import com.japzio.monitor.model.entity.Target;
 import com.japzio.monitor.model.CheckResultsStatus;
+import com.japzio.monitor.model.internal.CheckResultsDto;
 import com.japzio.monitor.properties.MonitorProperties;
-import com.japzio.monitor.repository.CheckResultRepository;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -25,10 +24,10 @@ public class TelnetTask  extends BaseTask implements Runnable {
 
     public TelnetTask(
            Target target,
-           CheckResultRepository checkResultRepository,
-           MonitorProperties monitorProperties
+           MonitorProperties monitorProperties,
+           InfluxDBClient influxDBClient
     ) {
-        super(checkResultRepository);
+        super(influxDBClient);
         this.target = target;
         this.monitorProperties = monitorProperties;
     }
@@ -42,7 +41,7 @@ public class TelnetTask  extends BaseTask implements Runnable {
         telnet.setDefaultTimeout(Math.toIntExact(timeout));
         log.info("runnable task - telnet - start targetId={}", target.getId());
         log.info("curl task={}, timeout={}", targetEndpoint, timeout);
-        var status = CheckResultsStatus.NOT_OK.name();
+        var success = false;
         var description = "";
         var start = Instant.now();
         try {
@@ -67,7 +66,7 @@ public class TelnetTask  extends BaseTask implements Runnable {
                 System.out.print(new String(buffer, 0, bytesRead));
                 // You might need more sophisticated logic to determine when the response is complete
             }
-            status = CheckResultsStatus.OK.name();
+            success = true;
         } catch (IOException e) {
             description = "Error connecting or communicating";
             log.error("Error connecting or communicating: {}", e.getMessage());
@@ -84,14 +83,16 @@ public class TelnetTask  extends BaseTask implements Runnable {
 
         log.info("telnet - {}", targetEndpoint);
         var duration = Duration.between(start, Instant.now()).getSeconds();
-        log.info("telnet result - {}, duration={}", status, duration);
+        log.info("telnet result success - {}, duration={}", success, duration);
         saveCheckResult(
-                CheckResult.builder()
-                        .status(status)
+                CheckResultsDto.builder()
+                        .success(success)
                         .targetId(target.getId())
-                        .duration(status.equals(CheckResultsStatus.OK.name()) ? (int) duration : null)
-                        .createdAt(Timestamp.from(Instant.now()))
-                        .description(status.equalsIgnoreCase(CheckResultsStatus.NOT_OK.name())? description : "")
+                        .endpoint(target.getEndpoint())
+                        .method(target.getMethod().toString())
+                        .duration(success ? (int) duration : 0 )
+                        .createdAt(Instant.now())
+                        .description(!success ? description : "")
                         .build()
         );
         log.info("runnable task - telnet - done");

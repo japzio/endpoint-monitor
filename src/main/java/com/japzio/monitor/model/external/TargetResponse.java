@@ -1,6 +1,6 @@
-package com.japzio.monitor.model.dto;
+package com.japzio.monitor.model.external;
 
-import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.model.entity.Target;
 import com.japzio.monitor.model.SupportedMethods;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

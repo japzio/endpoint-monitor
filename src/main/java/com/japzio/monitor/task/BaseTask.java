@@ -1,24 +1,49 @@
 package com.japzio.monitor.task;
 
-import com.japzio.monitor.entity.CheckResult;
-import com.japzio.monitor.repository.CheckResultRepository;
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.WriteApi;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
+import com.japzio.monitor.model.entity.CheckResult;
+import com.japzio.monitor.model.CheckResultsStatus;
+import com.japzio.monitor.model.internal.CheckResultsDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class BaseTask {
 
     private static final Logger log = LoggerFactory.getLogger(BaseTask.class);
+    private final InfluxDBClient influxDBClient;
 
-    private final CheckResultRepository checkResultRepository;
-
-    public BaseTask(CheckResultRepository checkResultRepository) {
-        this.checkResultRepository = checkResultRepository;
+    public BaseTask(InfluxDBClient influxDBClient) {
+        this.influxDBClient = influxDBClient;
     }
 
-    protected void saveCheckResult(CheckResult checkResult) {
-        log.info("action=saveCheckResult, info=start, targetId={}", checkResult.getTargetId());
-        var savedCheckResult = checkResultRepository.save(checkResult);
-        log.info("action=saveCheckResult, info=done, resultId={}", savedCheckResult.getId());
+    protected void saveCheckResult(CheckResultsDto checkResultsDto) {
+        log.info("action=saveCheckResult, info=start, targetId={}", checkResultsDto.getTargetId());
+
+        try (WriteApi writeApi = influxDBClient.getWriteApi()) {
+
+            // Create a data point
+            Point point = Point.measurement("check_results")
+                    .addTag("target_id", checkResultsDto.getTargetId().toString())
+                    .addTag("method", checkResultsDto.getMethod())
+                    .addField("response_time", checkResultsDto.getDuration())
+                    .addField(
+                            "success",
+                            checkResultsDto.getSuccess()
+                    )
+                    .time(System.currentTimeMillis(), WritePrecision.MS);
+
+
+            writeApi.writePoint(point);
+
+            log.info("action=saveCheckResult, info=done, dataPoint={}", point.toLineProtocol());
+
+        } catch (Exception e) {
+            // Log error (e.g., using SLF4J)
+            log.error("action=saveCheckResult, error=writeException, message={}", e.getMessage());
+        }
     }
 
 }

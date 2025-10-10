@@ -21,6 +21,12 @@ spring:
     user: endpointmonitor
     password: endpointmonitor
 
+influx:
+  url: http://localhost:8086
+  token: 7uRrgpomLPMhGclw9ALX1GENt2rAkS3lTwl4XL6VSduDqLbGouIUqKtJae7IKlVUkEDiC9rnI2Hpouaqf4a2UA==
+  org: myorg
+  bucket: monitoringv2
+
 logging:
   level:
     org.hibernate.SQL: info

@@ -1,4 +1,4 @@
-package com.japzio.monitor.entity;
+package com.japzio.monitor.model.entity;
 
 import com.japzio.monitor.model.SupportedMethods;
 import jakarta.persistence.Column;

@@ -1,7 +1,9 @@
 package com.japzio.monitor.service;
 
 import com.japzio.monitor.model.command.AddTargetCommand;
-import com.japzio.monitor.model.dto.*;
+import com.japzio.monitor.model.command.GetAllCheckResultsCommand;
+import com.japzio.monitor.model.command.GetAllTargetsCommand;
+import com.japzio.monitor.model.external.*;
 
 public interface MonitorService {
 
@@ -9,6 +11,5 @@ public interface MonitorService {
     TargetResponse getTarget(String targetId);
     GetAllTargetsResponse getAllTargets(GetAllTargetsCommand command);
     void removeTarget(String targetId);
-    GetAllCheckResultsResponse getAllTargetCheckResults(GetAllCheckResultsCommand command);
 
 }

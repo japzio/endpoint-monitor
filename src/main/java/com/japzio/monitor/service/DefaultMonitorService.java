@@ -1,20 +1,15 @@
 package com.japzio.monitor.service;
 
-import com.japzio.monitor.entity.CheckResult;
-import com.japzio.monitor.entity.Target;
+import com.japzio.monitor.model.entity.Target;
 import com.japzio.monitor.exception.AddNewTargetException;
 import com.japzio.monitor.exception.TargetNotFoundException;
 import com.japzio.monitor.model.command.AddTargetCommand;
-import com.japzio.monitor.model.dto.AddTargetRequest;
-import com.japzio.monitor.model.dto.AddTargetResponse;
-import com.japzio.monitor.model.dto.CheckResultResponse;
-import com.japzio.monitor.model.dto.GetAllCheckResultsCommand;
-import com.japzio.monitor.model.dto.GetAllCheckResultsResponse;
-import com.japzio.monitor.model.dto.GetAllTargetsCommand;
-import com.japzio.monitor.model.dto.GetAllTargetsResponse;
-import com.japzio.monitor.model.dto.Metadata;
-import com.japzio.monitor.model.dto.TargetResponse;
-import com.japzio.monitor.repository.CheckResultRepository;
+import com.japzio.monitor.model.external.AddTargetRequest;
+import com.japzio.monitor.model.external.AddTargetResponse;
+import com.japzio.monitor.model.command.GetAllTargetsCommand;
+import com.japzio.monitor.model.external.GetAllTargetsResponse;
+import com.japzio.monitor.model.external.Metadata;
+import com.japzio.monitor.model.external.TargetResponse;
 import com.japzio.monitor.repository.TargetRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -39,16 +33,13 @@ public class DefaultMonitorService implements MonitorService {
 
     private final MonitorValidatorService monitorValidatorService;
     private final TargetRepository targetRepository;
-    private final CheckResultRepository checkResultRepository;
 
     public DefaultMonitorService(
             @Autowired MonitorValidatorService monitorValidatorService,
-            @Autowired TargetRepository targetRepository,
-            @Autowired CheckResultRepository checkResultRepository
+            @Autowired TargetRepository targetRepository
     ) {
         this.monitorValidatorService = monitorValidatorService;
         this.targetRepository = targetRepository;
-        this.checkResultRepository = checkResultRepository;
     }
 
     @Override
@@ -124,38 +115,6 @@ public class DefaultMonitorService implements MonitorService {
         return AddTargetResponse.builder()
                 .id(target.getId().toString())
                 .build();
-    }
-
-    @Override
-    public GetAllCheckResultsResponse getAllTargetCheckResults(GetAllCheckResultsCommand command) {
-
-        var pageRequest = PageRequest.of(
-                command.getPage(),
-                command.getSize(),
-                Sort.by(
-                        Sort.Direction.valueOf(command.getOrder()),
-                        CHECK_RESULTS_ODER_FIELD
-                )
-        );
-
-        Page<CheckResult> result = checkResultRepository.findAllByTargetId(command.getTargetId(), pageRequest);
-
-        return GetAllCheckResultsResponse.builder()
-                .checkResults(
-                        result.getContent().stream()
-                                .map(CheckResultResponse::fromEntity)
-                                .toList()
-                )
-                .metadata(
-                        Metadata.builder()
-                                .currentPage(result.getNumber())
-                                .currentPageItems(result.getContent().size())
-                                .totalPages(result.getTotalPages())
-                                .totalElements(result.getTotalElements())
-                                .build()
-                )
-                .build();
-
     }
 
 }

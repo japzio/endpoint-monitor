@@ -46,38 +46,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: check_results; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.check_results (
-    id uuid DEFAULT gen_random_uuid() CONSTRAINT check_results_result_id_not_null NOT NULL,
-    target_id uuid CONSTRAINT check_results_endpoint_id_not_null NOT NULL,
-    status character varying(50) NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: check_results_result_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.check_results_result_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: check_results_result_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.check_results_result_id_seq OWNED BY public.check_results.id;
-
-
---
 -- Name: targets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -110,30 +78,12 @@ CREATE SEQUENCE public.endpoints_id_seq
 
 ALTER SEQUENCE public.endpoints_id_seq OWNED BY public.targets.id;
 
-
---
--- Name: check_results check_results_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.check_results
-    ADD CONSTRAINT check_results_pkey PRIMARY KEY (id);
-
-
 --
 -- Name: targets endpoints_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.targets
     ADD CONSTRAINT endpoints_pkey PRIMARY KEY (id);
-
-
---
--- Name: check_results check_results_target_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.check_results
-    ADD CONSTRAINT check_results_target_id_fkey FOREIGN KEY (target_id) REFERENCES public.targets(id) ON DELETE CASCADE;
-
 
 --
 -- PostgreSQL database dump complete

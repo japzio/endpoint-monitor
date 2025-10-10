@@ -8,10 +8,17 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.InfluxDBContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -28,7 +35,8 @@ class EndpointMonitorApplicationTests {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("endpointmonitor")
             .withUsername("testuser")
-            .withPassword("testpass");
+            .withPassword("testpass")
+            .waitingFor(new HostPortWaitStrategy());
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -38,6 +46,24 @@ class EndpointMonitorApplicationTests {
         registry.add("spring.liquibase.url", postgres::getJdbcUrl);
         registry.add("spring.liquibase.user", postgres::getUsername);
         registry.add("spring.liquibase.password", postgres::getPassword);
+    }
+
+    @Container
+    static InfluxDBContainer<?> influxDBContainer = new InfluxDBContainer<>(
+            DockerImageName.parse("influxdb:2.7"))
+            .withEnv("DOCKER_INFLUXDB_INIT_MODE", "setup")
+            .withEnv("DOCKER_INFLUXDB_INIT_USERNAME", "admin")
+            .withEnv("DOCKER_INFLUXDB_INIT_PASSWORD", "testpassword")
+            .withEnv("DOCKER_INFLUXDB_INIT_ORG", "testorg")
+            .withEnv("DOCKER_INFLUXDB_INIT_BUCKET", "testbucket")
+            .waitingFor(new HttpWaitStrategy());
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        registry.add("influx.url", influxDBContainer::getUrl);
+        registry.add("influx.token", () -> influxDBContainer.getAdminToken().orElse("testpassword")); // Use the helper from Step 3
+        registry.add("influx.org", () -> "myorg");
+        registry.add("influx.bucket", () -> "endpointmonitoring");
     }
 
     @Test

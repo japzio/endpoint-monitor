@@ -10,14 +10,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelog-004-add-target-column-timeout.yaml
   - include:
-      file: db/changelog/changelog-005-add-target-id-index.yaml
-  - include:
-      file: db/changelog/changelog-006-add-request-duration.yaml
-  - include:
-      file: db/changelog/changelog-007-add-description.yaml
-  - include:
       file: db/changelog/changelog-008-unique-endpoint.yaml
   - include:
       file: db/changelog/changelog-009-endpoint-change-type.yaml
-  - include:
-      file: db/changelog/changelog-010-check-status-enum.yaml

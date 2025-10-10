@@ -69,6 +69,38 @@ Run manually for development or debugging:
     - Check pending changesets: `mvn liquibase:status`
     - Roll back last changeset: `mvn liquibase:rollback -Dliquibase.rollbackCount=1`
 
+## TSDB for Check Result Logs
+
+InfluxDB Integration - Local Testing
+
+Run influxdb docker
+```
+docker run -p 8086:8086 \
+    -e DOCKER_INFLUXDB_INIT_MODE=setup \
+    -e DOCKER_INFLUXDB_INIT_USERNAME=admin \
+    -e DOCKER_INFLUXDB_INIT_PASSWORD=adminpassword \
+    -e DOCKER_INFLUXDB_INIT_ORG=myorg \
+    -e DOCKER_INFLUXDB_INIT_BUCKET=monitoring \
+    influxdb:2.7
+```
+
+Generate Token
+Navigate to `http://localhost:8086:8086`, login and generate new token
+
+Update `application-local.yaml` 
+
+```
+influx:
+  token: <token>
+```
+
+Run Application
+
+```
+./mvnw spring-boot:run -Dmaven.test.skip=true
+```
+
+
 ## Testing
 
 ### Local
