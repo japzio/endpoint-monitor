@@ -72,9 +72,6 @@ class EndpointMonitorApplicationTests {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Request-Reference-No", UUID.randomUUID().toString());
-        // Example custom header
-
-        HttpEntity<String> httpEntity = new HttpEntity<>(null, headers);
 
         // Act: Send GET request
         ResponseEntity<String> response = restTemplate
