@@ -4,8 +4,6 @@ import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import com.japzio.monitor.model.entity.CheckResult;
-import com.japzio.monitor.model.CheckResultsStatus;
 import com.japzio.monitor.model.internal.CheckResultsDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,15 +24,12 @@ public abstract class BaseTask {
 
             // Create a data point
             Point point = Point.measurement("check_results")
-                    .addTag("target_id", checkResultsDto.getTargetId().toString())
+                    .addTag("endpoint", checkResultsDto.getEndpoint())
                     .addTag("method", checkResultsDto.getMethod())
+                    .addTag("description", checkResultsDto.getDescription())
+                    .addTag("success", checkResultsDto.getSuccess().toString())
                     .addField("response_time", checkResultsDto.getDuration())
-                    .addField(
-                            "success",
-                            checkResultsDto.getSuccess()
-                    )
                     .time(System.currentTimeMillis(), WritePrecision.MS);
-
 
             writeApi.writePoint(point);
 

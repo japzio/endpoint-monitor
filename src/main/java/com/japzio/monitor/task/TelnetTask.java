@@ -90,7 +90,7 @@ public class TelnetTask  extends BaseTask implements Runnable {
                         .targetId(target.getId())
                         .endpoint(target.getEndpoint())
                         .method(target.getMethod().toString())
-                        .duration(success ? (int) duration : 0 )
+                        .duration((int) duration)
                         .createdAt(Instant.now())
                         .description(!success ? description : "")
                         .build()

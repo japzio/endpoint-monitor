@@ -51,7 +51,7 @@ public class PingTask extends BaseTask implements Runnable {
                 log.info("ping exec - {} is reachable.", targetEndpoint);
             } else {
                 description = "NOT reachable.";
-                log.info("ping exec - {} is NOT reachable.", targetEndpoint);
+                log.error("ping exec - {} is NOT reachable.", targetEndpoint);
             }
 
             log.info("ping exec - {}", targetEndpoint);
@@ -69,7 +69,7 @@ public class PingTask extends BaseTask implements Runnable {
                         .targetId(target.getId())
                         .endpoint(target.getEndpoint())
                         .method(target.getMethod().toString())
-                        .duration(success ? (int) duration : 0 )
+                        .duration((int)duration)
                         .createdAt(Instant.now())
                         .description(!success ? description : "")
                         .build()

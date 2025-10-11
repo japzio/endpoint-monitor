@@ -200,6 +200,7 @@
                     <outputFileName>openapi.json</outputFileName>
                     <skip>false</skip>
                     <failOnError>false</failOnError>
+                    <prettyPrint>true</prettyPrint>
                 </configuration>
             </plugin>
 		</plugins>

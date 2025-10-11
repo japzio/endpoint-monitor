@@ -47,8 +47,7 @@ public class CurlTask extends  BaseTask implements Runnable {
                         .targetId(target.getId())
                         .endpoint(target.getEndpoint())
                         .method(target.getMethod().toString())
-                        .duration(
-                                curlRequest.getHttpCode() == 200 ? (int) curlRequest.getExecTime() : 0 )
+                        .duration((int) curlRequest.getExecTime())
                         .createdAt(Instant.now())
                         .description(success ? String.valueOf(curlRequest.getHttpCode()) : "")
                         .build()

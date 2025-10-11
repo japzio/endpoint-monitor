@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: add-unique-endpoint-constraint
+      id: add-unique-endpoint-constraint-updated
       author: japzio
       changes:
         - addUniqueConstraint:

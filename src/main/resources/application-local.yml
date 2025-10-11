@@ -23,9 +23,10 @@ spring:
 
 influx:
   url: http://localhost:8086
-  token: 7uRrgpomLPMhGclw9ALX1GENt2rAkS3lTwl4XL6VSduDqLbGouIUqKtJae7IKlVUkEDiC9rnI2Hpouaqf4a2UA==
+  # override token thru environment variable
+  token: OP89t4kFbbXolp3wApIT1rEvK9ny7M9jISXaoj6tbQDq2RLv9_yuKiVdgwRh-58woMPE9OR-TTELhYRaNSfKSw==
   org: myorg
-  bucket: monitoringv2
+  bucket: monitoring
 
 logging:
   level:
