@@ -1,6 +1,6 @@
 # Endpoint Monitor
 
-A self-hosted endpoint monitoring tool built with Spring Boot 3.5.x and Java 21, supporting curl (java-curl), ping (InetAddress.isReachable), and telnet (commons-net TelnetClient). Targets are stored in PostgreSQL 18, with checks run via Spring Scheduler and results saved in a `check_results` table. Liquibase manages schema migrations, and tests use TestRestTemplate and TestContainers.
+A self-hosted endpoint monitoring tool built with Spring Boot 3.5.x and Java 21, supporting curl (java-curl), ping (InetAddress.isReachable), and telnet (commons-net TelnetClient). Targets are stored in PostgreSQL 18, with checks run via Spring Scheduler and are pushed to influxdb. Liquibase manages schema migrations, and tests use TestRestTemplate and TestContainers.
 
 ## Badges
 
